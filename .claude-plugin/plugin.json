@@ -1,0 +1,32 @@
+{
+  "name": "sunridge-skills",
+  "version": "0.1.0",
+  "description": "Sunridge agent skills: grilling, review, diagnosis, research, value-case flows, steps pages, and broad orchestration for product and engineering work.",
+  "author": {
+    "name": "Sunridge",
+    "url": "https://github.com/arifsunridge/skills"
+  },
+  "repository": "https://github.com/arifsunridge/skills",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "grilling",
+    "code-review",
+    "research",
+    "orchestrate",
+    "value-case",
+    "steps-page",
+    "product",
+    "engineering"
+  ],
+  "skills": [
+    "./skills/productivity/grill-me",
+    "./skills/productivity/grilling",
+    "./skills/engineering/code-review",
+    "./skills/engineering/diagnosing-bugs",
+    "./skills/engineering/research",
+    "./skills/product/steps-page",
+    "./skills/product/value-case-flows",
+    "./skills/orchestrate"
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "title": "Acme Ordering Flows",
+  "header": {
+    "label": "Sunridge Partners · Internal · Draft",
+    "h1": ["Acme", "Ordering, Before and After"],
+    "meta": "21 October 2026 · Author · Ordering app live since Mon 12 Oct (invented example)",
+    "lead_html": "Before, each order was <strong>typed by hand 2 times</strong> and its date was <strong>lost in 2 places</strong>. With the ordering app, stock is checked every 15 minutes and a person keys the ERP once. Clerk and lead effort drops from <strong>~20 to ~8 hours a week</strong> (estimate)."
+  },
+  "sections": [
+    {
+      "id": "data",
+      "h2": ["Data flow", "where data moves and breaks"],
+      "views": [
+        {"key": "before", "label": "Before", "svg": "out/data-flow-before.svg",
+         "say": "<strong>Before:</strong> every order was retyped into the ERP and the plan spreadsheet, from a stock report up to a day old."},
+        {"key": "after", "label": "After", "svg": "out/data-flow-after.svg",
+         "say": "<strong>After:</strong> the app re-reads the ERP every 15 minutes and never writes to it; a person keys the ERP once."}
+      ]
+    },
+    {
+      "id": "proc",
+      "h2": ["Process", "how one order gets planned"],
+      "views": [
+        {"key": "before", "label": "Before", "svg": "out/process-before.svg",
+         "say": "<strong>Before:</strong> six hand steps, and any change sent steps 2 to 6 back to be redone."},
+        {"key": "after", "label": "After", "svg": "out/process-after.svg",
+         "say": "<strong>After:</strong> the app checks stock and drafts each route; people confirm, key and send.",
+         "rule": "Rule: no stock OK, no place on the plan."}
+      ]
+    }
+  ],
+  "key": [
+    {"title": "R: retyped by hand", "items": [
+      {"code": "R1", "text": "Order retyped from the customer's email into the ERP"},
+      {"code": "R2", "text": "Order, line and shift retyped into the plan spreadsheet"}
+    ]},
+    {"title": "D: where a date gets lost (before) or kept (after)", "items": [
+      {"code": "D1", "text": "Customer's promised date stays in an inbox", "tone": "g"},
+      {"code": "D2", "text": "Supplier date changes come by email, often not keyed", "tone": "g"},
+      {"code": "D", "text": "After: both are kept in the app as dated events with a reason", "tone": "d kept"}
+    ]}
+  ],
+  "changed": {
+    "h2": ["What changed", "per order and per week"],
+    "head": ["", "Before (to Sep 2026)", "After (since 12 Oct)"],
+    "rows": [
+      ["Typed by hand per order", "2 times", "1 (keyed into the ERP, by design)"],
+      ["Stock check", "By hand, on overnight data", "Every open order, every 15 min"],
+      ["Clerk and lead effort", "~20 h/week", "~8 h/week", "estimate, ~12 h freed"],
+      ["Why a date moved", "Not recorded", "Reason on every move; every save logged"]
+    ]
+  },
+  "gaps": {
+    "h2": ["Still manual", "and what removes it"],
+    "head": ["Gap", "Removed by", "Owner"],
+    "rows": [
+      ["Keying decisions into the ERP", "ERP write-back after a person's OK (not approved yet)", "IT"],
+      ["Plan spreadsheet runs alongside", "Switch to the app's plan on a set date", "Planning lead"]
+    ]
+  },
+  "footer": [
+    "Measured figures: ERP read-only, 21 Oct 2026. Effort hours are estimates for each owner to confirm. Invented example.",
+    "Sunridge Partners – Confidential"
+  ]
+}
