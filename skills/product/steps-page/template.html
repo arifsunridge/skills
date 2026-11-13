@@ -1,0 +1,206 @@
+<title>__TITLE__</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one column of steps in three parts under a sticky progress bar; the open step is the one to do now. Same look on every steps page. */
+:root {
+  --bg: #faf8f2; --surface: #ffffff; --surface-2: #f4f1e7; --border: #e2dccb;
+  --ink: #262219; --ink-2: #5a5244; --ink-3: #6c6354;
+  --primary: #5c6449; --primary-ink: #ffffff; --primary-soft: #eceedf;
+  --ok: #3d6b2f; --ok-bg: #e7efdc; --warn: #85500b; --warn-bg: #fbefd8; --info: #2c5a7a; --info-bg: #e2edf4;
+  --ui: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15170f; --surface: #1d2016; --surface-2: #24281c; --border: #3a3f2e;
+  --ink: #eeeadf; --ink-2: #c9c3b3; --ink-3: #a59f8f;
+  --primary: #a8b48a; --primary-ink: #15170f; --primary-soft: #2c3222;
+  --ok: #9fca8c; --ok-bg: #233019; --warn: #e5b46a; --warn-bg: #3a2c14; --info: #8fbbdb; --info-bg: #1c2b36;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #15170f; --surface: #1d2016; --surface-2: #24281c; --border: #3a3f2e;
+  --ink: #eeeadf; --ink-2: #c9c3b3; --ink-3: #a59f8f;
+  --primary: #a8b48a; --primary-ink: #15170f; --primary-soft: #2c3222;
+  --ok: #9fca8c; --ok-bg: #233019; --warn: #e5b46a; --warn-bg: #3a2c14; --info: #8fbbdb; --info-bg: #1c2b36;
+  color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-size: 15px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+.wrap { max-width: 860px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 64px; }
+
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--border); }
+header.top .wrap { padding-block: 14px 12px; display: grid; gap: 8px; }
+.brand { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+h1 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; }
+.count { color: var(--ink-2); font-size: 13px; font-variant-numeric: tabular-nums; }
+.bar { height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--primary); transition: width 200ms ease; }
+
+.intro { margin: 20px 0 8px; display: grid; gap: 10px; color: var(--ink-2); max-width: 68ch; }
+.intro p { margin: 0; }
+.callout { border: 1px solid var(--border); border-left: 4px solid var(--info); background: var(--info-bg); color: var(--ink); padding: 10px 14px; border-radius: 3px; }
+.callout.warn { border-left-color: var(--warn); background: var(--warn-bg); }
+.callout.ok { border-left-color: var(--ok); background: var(--ok-bg); }
+
+h2.part { margin: 32px 0 10px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); }
+
+.step { background: var(--surface); border: 1px solid var(--border); border-radius: 3px; margin-bottom: 8px; }
+.step > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 12px 14px; }
+.step > summary::-webkit-details-marker { display: none; }
+.step > summary:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.num { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: var(--surface-2); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.step[data-state="done"] .num { background: var(--ok); color: var(--surface); }
+.step[data-state="skip"] .num { background: var(--border); }
+.stitle { font-weight: 600; min-width: 0; }
+.stitle small { display: block; font-weight: 400; color: var(--ink-3); font-size: 13px; }
+.pill { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 2px; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; }
+.step[data-state="done"] .pill { background: var(--ok-bg); color: var(--ok); }
+.body { padding: 2px 16px 16px 58px; display: grid; gap: 12px; min-width: 0; }
+.body p { margin: 0; max-width: 68ch; }
+.why { color: var(--ink-2); font-size: 14px; }
+ol.do { margin: 0; padding-left: 20px; display: grid; gap: 6px; max-width: 70ch; }
+ol.do li::marker { color: var(--ink-3); font-variant-numeric: tabular-nums; }
+code, .mono { font-family: var(--mono); font-size: 0.88em; background: var(--surface-2); padding: 1px 5px; border-radius: 2px; overflow-wrap: anywhere; }
+b { font-weight: 600; }
+
+.links { display: flex; flex-wrap: wrap; gap: 8px; }
+a.go, button { font: inherit; font-size: 14px; font-weight: 600; border-radius: 2px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 6px 12px; }
+a.go { background: var(--primary-soft); color: var(--ink); border: 1px solid var(--border); }
+a.go::after { content: "\2197"; color: var(--ink-3); font-weight: 400; }
+a.go:hover { border-color: var(--primary); }
+button { border: 1px solid var(--border); background: var(--surface); color: var(--ink); }
+button.primary { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
+button:hover { border-color: var(--primary); }
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px dashed var(--border); margin-top: 4px; padding-top: 12px; }
+
+.val { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: start; }
+.val label { grid-column: 1 / -1; font-size: 12px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.05em; }
+.val textarea, .val input { width: 100%; font-family: var(--mono); font-size: 13px; padding: 7px 9px; border: 1px solid var(--border); border-radius: 2px; background: var(--surface-2); color: var(--ink); resize: vertical; min-width: 0; }
+.val textarea.msg { font-family: var(--ui); font-size: 14px; }
+
+.claude { border: 1px solid var(--info); border-radius: 3px; padding: 12px 14px; display: grid; gap: 8px; background: var(--info-bg); }
+.claude > b { color: var(--info); font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; }
+.toast { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 3px; font-size: 14px; font-weight: 600; opacity: 0; transition: opacity 150ms; pointer-events: none; }
+.toast.on { opacity: 1; }
+@media (max-width: 560px) { .body { padding-left: 16px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header class="top"><div class="wrap">
+  <div class="brand"><h1 id="title"></h1><span class="count" id="count">0 of 0 done</span></div>
+  <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+</div></header>
+
+<main class="wrap">
+  <div class="intro">
+    <p><span id="total"></span> steps, in order, about <span id="minutes"></span> minutes. Each says where to go, what to click and what to type. Open a step, do it, then press <b>Done</b>; the next one opens. Ticks are remembered in this browser.</p>
+    <div class="callout"><b>Blue boxes are for Claude.</b> Copy the message into the chat; Claude does its part and checks the result, then you carry on.</div>
+    <div id="callouts" style="display:grid;gap:10px"></div>
+  </div>
+  <div id="steps"></div>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+/* ===== LIBRARY (top): identical on every steps page. Do not edit. ===== */
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+/** A button-styled link that opens in a new tab. */
+const link = (href, text) => `<a class="go" href="${esc(href)}" target="_blank" rel="noopener">${esc(text)}</a>`;
+let vid = 0;
+/** A read-only value with a Copy button. opts.rows makes it a text area. Never put a secret here. */
+function value(label, text, opts = {}) {
+  const id = 'v' + (++vid);
+  const field = opts.rows
+    ? `<textarea id="${id}" rows="${opts.rows}" readonly class="${opts.msg ? 'msg' : ''}">${esc(text)}</textarea>`
+    : `<input id="${id}" readonly value="${esc(text)}">`;
+  return `<div class="val"><label for="${id}">${esc(label)}</label>${field}<button type="button" data-copy="${id}">Copy</button></div>`;
+}
+/** A blue box: the message the person sends to Claude when Claude must act or check. */
+function claude(text) {
+  return `<div class="claude"><b>Send this to Claude</b>${value('Message', text, { rows: Math.min(5, 2 + Math.ceil(text.length / 90)), msg: true })}</div>`;
+}
+/** A coloured note inside a step: kind is '' (info), 'warn' or 'ok'. */
+const note = (html, kind = '') => `<div class="callout ${kind}">${html}</div>`;
+
+/* ===== PAGE: the only part you write. ===== */
+const PAGE = {
+  key: 'steps-example-v1',          // localStorage key: unique per page, bump the version when steps change
+  title: 'Example deploy setup',    // also replace __TITLE__ in the <title> tag at the top of the file
+  minutes: 5,
+  callouts: [                        // shown under the intro: what cannot break, what not to do yet
+    ['<b>Nothing here can break the live app.</b> Until the deploy step it keeps running today\u2019s version.', 'ok'],
+  ],
+  steps: [
+    { part: 'Where the steps happen, e.g. Render: my-service' },
+    { id: 'auto', title: 'Deploy only after the tests pass', sub: 'my-service \u2192 Settings \u2192 Auto-Deploy', body: () => `
+      <p class="why">One line on why this step matters.</p>
+      <div class="links">${link('https://dashboard.render.com', 'Open Render')}</div>
+      <ol class="do"><li>Click this.</li><li>Choose that and save.</li></ol>` },
+    { part: 'Deploy' },
+    { id: 'deploy', title: 'Say \u201cdeploy\u201d', sub: 'Claude checks your settings and deploys', body: () => `
+      ${claude('Steps are done: Auto-Deploy is After CI Checks Pass. Deploy.')}` },
+  ],
+};
+
+/* ===== LIBRARY (bottom): identical on every steps page. Do not edit. ===== */
+const KEY = PAGE.key;
+const STEPS = PAGE.steps;
+document.getElementById('title').textContent = PAGE.title;
+document.getElementById('callouts').innerHTML = PAGE.callouts.map(([html, kind]) => note(html, kind)).join('');
+let S = { done: {}, open: null };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch (e) { /* private window: works, forgets on close */ }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+
+const real = STEPS.filter((s) => s.id);
+function N(id) { return real.findIndex((s) => s.id === id) + 1; }
+document.getElementById('total').textContent = String(real.length);
+document.getElementById('minutes').textContent = String(PAGE.minutes);
+const root = document.getElementById('steps');
+function nextOpen() { const n = real.find((s) => !S.done[s.id]); return n ? n.id : null; }
+function render() {
+  vid = 0;
+  if (!S.open || !real.some((s) => s.id === S.open)) S.open = nextOpen();
+  let n = 0;
+  root.innerHTML = STEPS.map((s) => {
+    if (s.part) return `<h2 class="part">${esc(s.part)}</h2>`;
+    n++;
+    const st = S.done[s.id] || 'todo';
+    const pill = st === 'done' ? 'Done' : st === 'skip' ? 'Skipped' : 'To do';
+    return `<details class="step" id="${s.id}" data-state="${st}" ${S.open === s.id ? 'open' : ''}>
+      <summary><span class="num">${st === 'done' ? '✓' : n}</span><span class="stitle">${esc(s.title)}<small>${esc(s.sub)}</small></span><span class="pill">${pill}</span></summary>
+      <div class="body">${S.open === s.id ? s.body() : ''}
+        <div class="actions">${st === 'todo'
+          ? `<button type="button" class="primary" data-done="${s.id}">Done</button><button type="button" data-skip="${s.id}">Skip for now</button>`
+          : `<button type="button" data-undo="${s.id}">Mark as not done</button>`}</div></div></details>`;
+  }).join('');
+  const done = real.filter((s) => S.done[s.id]).length;
+  document.getElementById('count').textContent = `${done} of ${real.length} done`;
+  document.getElementById('bar').style.width = (100 * done / real.length) + '%';
+}
+
+let toastT;
+function toast(t) { const el = document.getElementById('toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 1600); }
+root.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.copy) {
+    const f = document.getElementById(b.dataset.copy);
+    (navigator.clipboard ? navigator.clipboard.writeText(f.value) : Promise.reject()).then(() => toast('Copied'), () => { f.focus(); f.select(); toast('Selected: press Ctrl+C'); });
+    return;
+  }
+  const go = (id) => { S.open = id; save(); render(); const el = id && document.getElementById(id); if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' }); };
+  if (b.dataset.done) { S.done[b.dataset.done] = 'done'; go(nextOpen()); toast('Done'); }
+  else if (b.dataset.skip) { S.done[b.dataset.skip] = 'skip'; go(nextOpen()); }
+  else if (b.dataset.undo) { delete S.done[b.dataset.undo]; go(b.dataset.undo); }
+});
+root.addEventListener('toggle', (e) => {
+  const d = e.target; if (!(d instanceof HTMLDetailsElement)) return;
+  if (d.open && S.open !== d.id) { S.open = d.id; save(); render(); }
+}, true);
+render();
+})();
+</script>
